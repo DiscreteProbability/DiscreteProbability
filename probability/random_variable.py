@@ -7,17 +7,37 @@ class RandomVariable(object):
         if type(other) == RandomVariable:
             return self.name == other.name
         else:
-            return RandomVariableValue(self, other)
+            return RandomVariableEvent(self, other)
 
     def __repr__(self):
         return self.name
 
+    def union(self, other):
+        return UnionRandomVariable(self, other)
 
-class RandomVariableValue(object):
+    def __or__(self, other):
+        return ConditionalRandomVariable(self, other)
 
-    def __init__(self, variable, value):
+
+class RandomVariableEvent(object):
+
+    def __init__(self, variable, event):
         self.variable = variable
-        self.value = value
+        self.event = event
 
     def __repr__(self):
-        return '{} = {}'.format(self.variable, self.value)
+        return '{} = {}'.format(self.variable, self.event)
+
+
+class UnionRandomVariable(object):
+
+    def __init__(self, X, Y):
+        self.X = X
+        self.Y = Y
+
+
+class ConditionalRandomVariable(object):
+
+    def __init__(self, X, Y):
+        self.of = X
+        self.given = Y

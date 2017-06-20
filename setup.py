@@ -24,7 +24,7 @@ def readme():
 
 setup(
     name='Probability',
-    version='0.5.0',
+    version='0.2.0',
 
     #description='Pythonic management of LV2 audio plugins with mod-host.',
     #long_description=readme(),
