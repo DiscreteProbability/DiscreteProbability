@@ -16,8 +16,7 @@ class ProbabilityDistribution(object):
         return experiment.calcule()
 
     def __init__(self, joint_distribution=None):
-        self.data = joint_distribution
-        #self.data = joint_distribution.set_index(keys=list(joint_distribution.columns[:-1]))
+        self.series = joint_distribution
 
     @property
     def variables(self):
@@ -88,13 +87,11 @@ class ProbabilityDistribution(object):
         return current.equals(other_data)
 
     def normalize(self):
-        df = self.data.copy()
-        df[self.values_column] = self.values / self.values.sum()
-
-        return ProbabilityDistribution(df)
+        normalized = self.series / self.series.sum()
+        return ProbabilityDistribution.from_joint_distribution(normalized)
 
     def __repr__(self):
-        return self.data.__repr__()
+        return self.series.__repr__()
 
     def __add__(self, other):
         return ProbabilityDistribution(self.data + other.data)
@@ -123,84 +120,3 @@ class ProbabilityDistribution(object):
     def exists_independence(self, X, Y):
         self = P
         return P((Intelligence == 'high') | (Grade == 'A')) == P(Intelligence == 'high') or P(Grade == 'A') == 0
-
-def ProbabilityCalculator(sample_space, *args, **kwargs):
-    class P(object):
-
-        def __init__(self, *args, **kwargs):
-            self.value = ProbabilityCalculator(sample_space, *args, **kwargs)
-
-        def __truediv__(self, other):
-            return self.value / other.value
-
-    if not args:
-        return 0
-
-    elif isinstance(args[0], Conditional):
-        S = sample_space
-        conditional = args[0]
-
-        x = conditional.x
-        y = conditional.y
-
-        return P(x, y) / P(y)
-
-    # Marginal
-    elif len(args) == 1:
-        x = args[0].key
-        return sample_space[x].sum()
-
-    # Conjunta
-    else:
-        x = args[0].key
-        y = args[1].key
-
-        return sample_space[x][y]
-
-    raise Exception('Não tratei isso ainda')
-
-
-class ProbabilityOld(object):
-    @staticmethod
-    def for_sample_space(sample_space):
-        """
-        :param sample_space bidimentional dataframe
-        """
-        return lambda *args, **kwargs: ProbabilityCalculator(sample_space, *args, **kwargs)
-
-
-class Conditional(object):
-    def __init__(self, x, given_y):
-        self.x = x
-        self.y = given_y
-
-    def __repr__(self):
-        return "'{}' given '{}'".format(self.x, self.y)
-
-
-class Event(object):
-    def __init__(self, key):
-        self.key = key
-
-    def __or__(self, other):
-        return Conditional(self, other)
-
-"""
-P = Probability.for_sample_space(item_b)
-'''
-def P(X, Y):
-    print(item_b)
-'''
-
-
-
-a = Event('a')
-b = Event('b')
-
-print('P() =', P())
-print('P(a) =', P(a))
-print('P(a, b) =', P(a, b))
-print('P(a | b) =', P(a | b))
-
-#P(X==x | Y==y) = P(X==x, Y==y)/P(Y==y)
-"""

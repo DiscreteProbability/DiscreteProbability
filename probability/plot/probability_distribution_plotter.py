@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 class ProbabilityDistributionPlotter(object):
@@ -7,18 +8,25 @@ class ProbabilityDistributionPlotter(object):
         self.P = probability_distribution
 
     def plot(self):
-        if len(self.P.data.keys()) == 2:
+        if type(self.P.series.index) == pd.Index:
             return self.plot_line()
 
-    def plot_line(self):
-        df = self.P.data
+        return None
 
-        labels = df[df.columns[0]]
-        y = self.P.values
+    def plot_line(self):
+        series = self.P.series
+
+        labels = series.index.values
+        y = series
 
         x = range(len(y))
         plt.stem(x, y)
         plt.xticks(x, labels)
-        plt.axis([-1, len(df), 0, y.max() * 1.125])
+        plt.axis([-1, len(series), 0, y.max() * 1.125])
+
+        plt.xlabel(series.index.name)
+        plt.ylabel('Probability')
+
+        plt.title('$P({})$'.format(series.index.name))
 
         return plt
