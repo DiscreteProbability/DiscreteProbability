@@ -1,26 +1,42 @@
 import operator
 from functools import reduce
 
-from probability.random_variable import RandomVariable, UnionRandomVariable, ConditionalRandomVariable, RandomVariableEvent
+import numpy as np
+import pandas as pd
+
 from probability.plot.probability_distribution_plotter import ProbabilityDistributionPlotter
+from probability.random_variable import RandomVariable, UnionRandomVariable, ConditionalRandomVariable, RandomVariableEvent
 
 
 class ProbabilityDistribution(object):
 
     @staticmethod
-    def from_joint_distribution(data_frame):
-        return ProbabilityDistribution(data_frame)
+    def from_joint_distribution(distribution):
+        if type(distribution) == pd.Series:
+            return ProbabilityDistribution(distribution)
+        elif type(distribution) == pd.DataFrame:
+            columns = list(distribution.columns)
+            series_columns = columns[:-1]
+            series_value = columns[-1]
+            series = distribution.groupby(series_columns).sum()[series_value]
+
+            return ProbabilityDistribution(series)
+
+        raise Exception('Expected pandas.Series or pandas.DataFrame')
 
     @staticmethod
     def from_experiment(experiment):
         return experiment.calcule()
 
-    def __init__(self, joint_distribution=None):
-        self.series = joint_distribution
+    def __init__(self, series=None):
+        self.series = series
 
     @property
     def variables(self):
-        return [RandomVariable(column) for column in self.data.columns[0:-1]]
+        index = self.series.index
+        names = [index.name] if type(index) == pd.Index else index.names
+
+        return [RandomVariable(column) for column in names]
 
     @property
     def values(self):
@@ -48,10 +64,14 @@ class ProbabilityDistribution(object):
             return self(*[X==x for X, x in zip(self.variables, args)])
 
     def _intersection_probability(self, *args):
-        df = self.data
-        variables = reduce(operator.and_, map(lambda v: df[v.variable.name] == v.event, args))
+        variables, events = [], []
+        for arg in args:
+            variables.append(arg.variable)
+            events.append(arg.event)
 
-        return ProbabilityDistribution(self.data[variables])
+        P = self
+
+        return P(*variables).series[events].sum()
 
     def _union_probability(self, union_random_variable):
         X = union_random_variable.X
@@ -70,21 +90,7 @@ class ProbabilityDistribution(object):
     def __eq__(self, other):
         if type(other) != ProbabilityDistribution:
             return False
-
-        current = self.data
-        other_data = other.data
-
-        if len(current.columns) > 1:
-            columns = list(current.columns[:-1])
-            current = current.sort_values(columns)
-            current = current.set_index(columns)
-
-        if len(other_data.columns) > 1:
-            columns = list(other_data.columns[:-1])
-            other_data = other_data.sort_values(columns)
-            other_data = other_data.set_index(columns)
-
-        return current.equals(other_data)
+        return np.isclose(self.series, other.series).all()
 
     def normalize(self):
         normalized = self.series / self.series.sum()
@@ -94,14 +100,14 @@ class ProbabilityDistribution(object):
         return self.series.__repr__()
 
     def __add__(self, other):
-        return ProbabilityDistribution(self.data + other.data)
+        return ProbabilityDistribution(self.series + other.series)
 
     def __sub__(self, other):
         # ProbabilityDistribution(self.data - other.data)
         return self.values - other.values
 
     def __truediv__(self, other):
-        df = self.data / other.data
+        df = self.series / other.series
         return ProbabilityDistribution.from_joint_distribution(df)
 
     def plot(self):
@@ -113,9 +119,9 @@ class ProbabilityDistribution(object):
 
     def joint_distribution(self, *variables):
         variables = [variable.name for variable in variables]
-        df = self.data
+        series = self.series
 
-        return ProbabilityDistribution(df.groupby(variables).sum())
+        return ProbabilityDistribution(series.groupby(level=variables).sum())
 
     def exists_independence(self, X, Y):
         self = P

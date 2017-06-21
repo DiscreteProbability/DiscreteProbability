@@ -41,12 +41,12 @@ class ExperimentTestCase(unittest.TestCase):
 
     def test_register(self):
         expected = [
-            Occurrence(['a1', 'b1', 'c1']),
-            Occurrence(['a1', 'b1', 'c2'], 3),
-            Occurrence(['a1', 'b2', 'c1']),
+            Occurrence(['Carlos', 'yellow', 'computer']),
+            Occurrence(['Carlos', 'yellow', 'smartphone'], 3),
+            Occurrence(['Paulo', 'blue', 'computer']),
         ]
 
-        experiment = Experiment('A', 'B', 'C')
+        experiment = Experiment('People', 'House', 'Computer')
 
         for occurrence in expected:
             experiment.register(occurrence)
@@ -61,11 +61,12 @@ class ExperimentTestCase(unittest.TestCase):
         ], columns=['A', 'B', 'C', 'probability'])
 
         experiment = Experiment('A', 'B', 'C')
+
         experiment.register(Occurrence(['a1', 'b1', 'c1']))
         experiment.register(Occurrence(['a1', 'b1', 'c2'], 3))
         experiment.register(Occurrence(['a1', 'b2', 'c1']))
 
-        self.assertEqual(ProbabilityDistribution(expected), experiment.calcule())
+        self.assertEqual(ProbabilityDistribution.from_joint_distribution(expected), experiment.calcule())
 
     def test_asd(self):
         print(

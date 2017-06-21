@@ -43,7 +43,8 @@ setup(
     ],
     install_requires=[
         'numpy',
-        'pandas'
+        'pandas',
+        'matplotlib'
     ],
 
     classifiers=[
