@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
 
 
 class ProbabilityDistributionPlotter(object):
@@ -10,6 +11,9 @@ class ProbabilityDistributionPlotter(object):
     def plot(self):
         if type(self.P.series.index) == pd.Index:
             return self.plot_line()
+
+        elif type(self.P.series.index) == pd.MultiIndex:
+            return self.plot_heartmap()
 
         return None
 
@@ -30,3 +34,8 @@ class ProbabilityDistributionPlotter(object):
         plt.title('$P({})$'.format(series.index.name))
 
         return plt
+
+    def plot_heartmap(self):
+        dataframe = self.P.series.unstack()
+
+        return sns.heatmap(dataframe, linewidths=.5, cmap="YlGnBu")

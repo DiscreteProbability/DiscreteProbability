@@ -71,6 +71,7 @@ class ProbabilityDistribution(object):
 
         P = self
 
+        events = events if len(events) == 1 else tuple(events)
         return P(*variables).series[events].sum()
 
     def _union_probability(self, union_random_variable):
@@ -100,15 +101,16 @@ class ProbabilityDistribution(object):
         return self.series.__repr__()
 
     def __add__(self, other):
-        return ProbabilityDistribution(self.series + other.series)
+        other = other.series if type(other) == ProbabilityDistribution else other
+        return ProbabilityDistribution(self.series + other)
 
     def __sub__(self, other):
         # ProbabilityDistribution(self.data - other.data)
         return self.values - other.values
 
     def __truediv__(self, other):
-        df = self.series / other.series
-        return ProbabilityDistribution.from_joint_distribution(df)
+        series = self.series / other.series
+        return ProbabilityDistribution.from_joint_distribution(series)
 
     def plot(self):
         return ProbabilityDistributionPlotter(self).plot()
