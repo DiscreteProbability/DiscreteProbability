@@ -128,3 +128,6 @@ class ProbabilityDistribution(object):
     def exists_independence(self, X, Y):
         self = P
         return P((Intelligence == 'high') | (Grade == 'A')) == P(Intelligence == 'high') or P(Grade == 'A') == 0
+
+    def to_dataframe(self):
+        return self.series.unstack().fillna(0)

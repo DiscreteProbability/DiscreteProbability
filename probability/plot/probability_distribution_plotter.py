@@ -36,6 +36,4 @@ class ProbabilityDistributionPlotter(object):
         return plt
 
     def plot_heartmap(self):
-        dataframe = self.P.series.unstack()
-
-        return sns.heatmap(dataframe, linewidths=.5, cmap="YlGnBu")
+        return sns.heatmap(self.P.to_dataframe(), linewidths=.5, cmap="YlGnBu")

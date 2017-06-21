@@ -44,7 +44,7 @@ class Experiment(object):
 
     def calcule(self):
         series = self.to_series()
-        level = series.index.names if len(self.columns) > 1 else series.index.name
+        level = series.index.names if len(series.index.names) > 1 else series.index.name
         series = series.groupby(level=level).sum()
 
         return ProbabilityDistribution.from_joint_distribution(series).normalize()
