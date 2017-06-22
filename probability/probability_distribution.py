@@ -1,11 +1,9 @@
-import operator
-from functools import reduce
-
 import numpy as np
 import pandas as pd
 
 from probability.plot.probability_distribution_plotter import ProbabilityDistributionPlotter
 from probability.random_variable import RandomVariable, UnionRandomVariable, ConditionalRandomVariable, RandomVariableEvent
+from probability.expectation import Expectation
 
 
 class ProbabilityDistribution(object):
@@ -112,8 +110,9 @@ class ProbabilityDistribution(object):
         series = self.series / other.series
         return ProbabilityDistribution.from_joint_distribution(series)
 
+    @property
     def plot(self):
-        return ProbabilityDistributionPlotter(self).plot()
+        return ProbabilityDistributionPlotter(self)
 
     def marginal(self, X):
         P = self
@@ -131,3 +130,7 @@ class ProbabilityDistribution(object):
 
     def to_dataframe(self):
         return self.series.unstack().fillna(0)
+
+    @property
+    def E(self):
+        return Expectation(self)
