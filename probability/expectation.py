@@ -1,3 +1,5 @@
+from numbers import Number
+
 
 class Expectation(object):
 
@@ -5,7 +7,16 @@ class Expectation(object):
         self.P = P
 
     def __getitem__(self, item):
+        if isinstance(item, Number):
+            return item
+
         P = self.P(item)
 
         series = P.series
         return (series * series.index).sum()
+
+
+class Variance(object):
+
+    def σ(self):
+        pass

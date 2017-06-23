@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from fractions import Fraction
 
 from probability.plot.probability_distribution_plotter import ProbabilityDistributionPlotter
 from probability.random_variable import RandomVariable, UnionRandomVariable, ConditionalRandomVariable, RandomVariableEvent
@@ -36,21 +37,23 @@ class ProbabilityDistribution(object):
 
         return [RandomVariable(column) for column in names]
 
-    @property
-    def values(self):
-        return self.data[self.values_column]
-
-    @property
-    def values_column(self):
-        return self.data.columns[-1]
-
     def __call__(self, *args, **kwargs):
         if len(args) == 0:
             return 0
 
         variable = args[0]
 
-        if type(variable) == RandomVariable:
+        if type(variable) == set:
+            return self(*[X == x for X, x in zip(self.variables, args)])
+
+            from functools import reduce
+
+            P = self
+            elements = list(variable)
+
+            return reduce(lambda x, y: x + P(y), elements[1:], P(elements[0]))
+
+        elif type(variable) == RandomVariable:
             return self.joint_distribution(*args)
         elif type(variable) == UnionRandomVariable:
             return self._union_probability(*args)
@@ -65,12 +68,12 @@ class ProbabilityDistribution(object):
         variables, events = [], []
         for arg in args:
             variables.append(arg.variable)
-            events.append(arg.event)
+            events.append(arg.event if type(arg.event) != set else list(arg.event))
 
         P = self
 
-        events = events if len(events) == 1 else tuple(events)
-        return P(*variables).series[events].sum()
+        events = tuple(events)
+        return P(*variables).series.loc[events].sum()
 
     def _union_probability(self, union_random_variable):
         X = union_random_variable.X
@@ -96,7 +99,7 @@ class ProbabilityDistribution(object):
         return ProbabilityDistribution.from_joint_distribution(normalized)
 
     def __repr__(self):
-        return self.series.__repr__()
+        return self.series.map(lambda x: Fraction(x).limit_denominator()).__repr__()
 
     def __add__(self, other):
         other = other.series if type(other) == ProbabilityDistribution else other
@@ -104,7 +107,7 @@ class ProbabilityDistribution(object):
 
     def __sub__(self, other):
         # ProbabilityDistribution(self.data - other.data)
-        return self.values - other.values
+        return self.series - other.series
 
     def __truediv__(self, other):
         series = self.series / other.series
