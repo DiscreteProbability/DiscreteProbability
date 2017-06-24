@@ -114,3 +114,9 @@ class ProbabilityDistributionTestCase(unittest.TestCase):
         Intelligence, Grade = P.variables
 
         print(P(Intelligence | Grade))
+
+    def test_anything(self):
+        P = self.P
+        Intelligence, Grade = P.variables
+
+        P(Intelligence | (Grade == 'A'))

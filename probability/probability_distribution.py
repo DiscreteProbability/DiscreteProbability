@@ -46,13 +46,6 @@ class ProbabilityDistribution(object):
         if type(variable) == set:
             return self(*[X == x for X, x in zip(self.variables, args)])
 
-            from functools import reduce
-
-            P = self
-            elements = list(variable)
-
-            return reduce(lambda x, y: x + P(y), elements[1:], P(elements[0]))
-
         elif type(variable) == RandomVariable:
             return self.joint_distribution(*args)
         elif type(variable) == UnionRandomVariable:
@@ -110,7 +103,9 @@ class ProbabilityDistribution(object):
         return self.series - other.series
 
     def __truediv__(self, other):
-        series = self.series / other.series
+        other_data = other.series if type(other) == ProbabilityDistribution else other
+
+        series = self.series / other_data
         return ProbabilityDistribution.from_joint_distribution(series)
 
     @property

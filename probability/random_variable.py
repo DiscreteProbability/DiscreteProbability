@@ -28,6 +28,10 @@ class RandomVariableEvent(object):
     def __repr__(self):
         return '{} = {}'.format(self.variable, self.event)
 
+    @property
+    def name(self):
+        return self.variable.name
+
 
 class UnionRandomVariable(object):
 
