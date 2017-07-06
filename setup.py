@@ -44,7 +44,8 @@ setup(
     install_requires=[
         'numpy',
         'pandas',
-        'matplotlib'
+        'matplotlib',
+        'seaborn'
     ],
 
     classifiers=[

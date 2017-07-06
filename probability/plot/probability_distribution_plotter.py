@@ -33,6 +33,8 @@ class ProbabilityDistributionPlotter(object):
 
         plt.title('$P({})$'.format(series.index.name))
 
+        plt.xticks(rotation=90)
+
         return plt
 
     def heartmap(self):
@@ -45,3 +47,6 @@ class ProbabilityDistributionPlotter(object):
     @property
     def bar(self):
         return self.P.series.plot.bar
+
+    def stacked_bar(self, **kwargs):
+        return self.P.series.unstack().plot(kind='bar', stacked=True, **kwargs)
