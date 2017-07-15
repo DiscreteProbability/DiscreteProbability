@@ -2,18 +2,21 @@ from probability.concept.assignment import Assignment
 from probability.concept.conditional import ConditionalRandomVariable
 from probability.concept.random_variable import RandomVariable, RandomVariables
 
+from probability.other.utils import Utils
+
 
 class ElementsList(object):
     """
     List of elements. This class is used for simplify parse ProbabilityDistribution
     """
 
-    def __init__(self, *args):
+    def __init__(self, probability_distribution, *args):
         """
         :param tuple args: RandomVariable, Assignment, ConditionalRandomVariable
                            or variable values: object or set
         """
         self.elements = args
+        self._probability_distribution = probability_distribution
 
     def contains_conditional_distribution(self):
         return any(type(element) == ConditionalRandomVariable for element in self.elements)
@@ -35,17 +38,23 @@ class ElementsList(object):
         return len(self) == 1 and isinstance(self[0], ConditionalRandomVariable)
 
     def to_conditional_random_variable(self):
+        query, evidences = self._remove_conditional()
+
+        if ... in evidences:
+            variables = self._probability_distribution.variables
+            evidences = Utils.parse_lazy_notation(variables, subset=evidences, ignore=query)
+
+        return ConditionalRandomVariable(RandomVariables(query), RandomVariables(evidences))
+
+    def _remove_conditional(self):
         index_conditional = list(isinstance(e, ConditionalRandomVariable) for e in self.elements).index(True)
 
         conditional = self[index_conditional]
 
         query = self[:index_conditional] + conditional.query_variables.subset
-        evidences = conditional.evidences.subset + self[index_conditional+1:]
+        evidences = conditional.evidences.subset + self[index_conditional + 1:]
 
-        return ConditionalRandomVariable(RandomVariables(query), RandomVariables(evidences))
-
-    def _conditional_index(self):
-        pass
+        return query, evidences
 
     def __getitem__(self, item):
         return self.elements.__getitem__(item)

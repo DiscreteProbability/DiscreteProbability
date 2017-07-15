@@ -39,9 +39,15 @@ class RandomVariable(AbstractRandomVariable, ContainerVariable):
     def random_variable(self):
         return self
 
+    @property
+    def assigned(self):
+        return False
+
     def __eq__(self, other):
         if type(other) == RandomVariable:
             return self.name == other.name
+        if other == Ellipsis:
+            return False
 
         return Assignment(self, self._generate_event(other))
 
@@ -79,14 +85,19 @@ class RandomVariables(AbstractRandomVariable):
     """
     `SetOfRandomVariables`
 
-    Data structures that contain RandomVariables (possibly with assignments).
+    Data structures that contain ContainerVariable (RandomVariable and Assignments).
     """
 
     def __init__(self, subset):
         """
-        :param tuple subset:
+        :param tuple[ContainerVariable] subset:
         """
-        self.subset = subset
+        self._subset = subset
+        self._dict = dict(map(lambda variable: (variable.name, variable), subset))
+
+    @property
+    def subset(self):
+        return self._subset
 
     @property
     def as_set(self):
@@ -101,6 +112,15 @@ class RandomVariables(AbstractRandomVariable):
     @property
     def names(self):
         return list(element.name for element in self.subset)
+
+    def get(self, variable_name):
+        return self._dict[variable_name]
+
+    def __getitem__(self, *args):
+        return self.subset.__getitem__(*args)
+
+    def __getattr__(self, item):
+        return self._dict[item]
 
 
 class UnionRandomVariable(object):

@@ -1,5 +1,5 @@
 import pandas as pd
-from probability.concept.random_variable import RandomVariables
+from probability.concept.random_variable import RandomVariable, RandomVariables
 from probability.probability_distribution import ProbabilityDistribution
 
 
@@ -20,6 +20,20 @@ class JointDistribution(object):
         dataframe = pd.DataFrame(distribution, columns=variables_names + (name, ))
 
         return ProbabilityDistribution.from_joint_distribution(dataframe).normalize()  # FIXME
+
+    @staticmethod
+    def from_experiment(experiment):
+        series = experiment.count()
+        return JointDistribution.from_series(series)
+
+    @staticmethod
+    def from_series(series):
+        variables = tuple(RandomVariable(variable_name) for variable_name in series.index.names)
+
+        variables = RandomVariables(variables)
+        series.name = 'P({})'.format(variables.__repr__())
+
+        return ProbabilityDistribution.from_joint_distribution(series).normalize()  # FIXME
 
     def renormalize(self):
         """

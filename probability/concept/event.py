@@ -14,6 +14,9 @@ class Event(object):
     def __len__(self):
         return self.elements.__len__()
 
+    def __eq__(self, other):
+        return self.elements == other.elements
+
     @property
     def is_singleton(self):
         """

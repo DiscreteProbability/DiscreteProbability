@@ -13,3 +13,7 @@ class ContainerVariable(metaclass=ABCMeta):
     def random_variable(self):
         return None
 
+    @property
+    @abstractmethod
+    def assigned(self):
+        return False

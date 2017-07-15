@@ -1,17 +1,19 @@
-import numpy as np
 import pandas as pd
-from fractions import Fraction
 
-from probability.plot.probability_distribution_plotter import ProbabilityDistributionPlotter
 from probability.concept.assignment import Assignment
-from probability.concept.conditional import ConditionalRandomVariable
-from probability.concept.random_variable import RandomVariable, UnionRandomVariable
-from probability.other.elements_list import ElementsList
-from probability.expectation import Expectation
+from probability.concept.random_variable import RandomVariable, RandomVariables
 from probability.conditional_distribution import ConditionalDistribution
+from probability.distribution.probability_distribution import AbstractProbabilityDistribution
+from probability.expectation import Expectation
+from probability.other.elements_list import ElementsList
+from probability.other.utils import Utils
+from probability.plot.probability_distribution_plotter import ProbabilityDistributionPlotter
+from probability.experiment import Experiment
 
 
-class ProbabilityDistribution(object):
+
+
+class ProbabilityDistribution(AbstractProbabilityDistribution):
 
     @staticmethod
     def from_joint_distribution(distribution):
@@ -32,17 +34,14 @@ class ProbabilityDistribution(object):
         return experiment.calcule()
 
     def __init__(self, series=None):
-        self.series = series
+        self._series = series
 
     @property
-    def variables(self):
-        index = self.series.index
-        names = [index.name] if type(index) == pd.Index else index.names
-
-        return [RandomVariable(column) for column in names]
+    def series(self):
+        return self._series
 
     def __call__(self, *args, **kwargs):
-        return self.parse(ElementsList(*args))
+        return self.parse(ElementsList(self, *args))
 
     def parse(self, elements_list):
         """
@@ -68,25 +67,56 @@ class ProbabilityDistribution(object):
 
         return self.joint_distribution(*elements_list.elements)
 
-    def reduction(self, *args):
+    def reduction(self, *variables):
+        """
+        :param list/tuple variables:
+        """
         P = self
-        variables = [var.random_variable for var in args]
+        random_variables = [var.random_variable for var in variables]
 
         events = []
-        for element in args:
-            values = P.Val(element) if type(element) != Assignment else element.event.elements
-            events.append(list(values))
+        for variable in variables:
+            values = P.Val(variable) if variable.assigned else variable.event.elements
+
+            values = tuple(values)
+            if len(values) == 1:
+                values = values[0]
+
+            events.append(values)
 
         events = tuple(events)
-        reduction = P(*variables).series.loc[events]
+        reduction = P(*random_variables).series.loc[events]
+
+        if not isinstance(reduction, pd.Series):
+            names = list(variable.name for variable in random_variables)
+            index = pd.MultiIndex.from_arrays(events, names=names)
+
+            reduction = pd.Series([reduction], index=index)
+            reduction.name = 'names'  # FIXME
 
         return P.from_joint_distribution(reduction)
 
+    def random_variables_series(self, P, random_variables, value):
+        names = random_variables.names
+        assignments = []
+        index = pd.MultiIndex.from_arrays(assignments, names=names)
+
+        series = pd.Series([value], index=index)
+        series.name = 'names'  # FIXME
+
+        return series
+
     def joint_distribution(self, *variables):
-        variables = [variable.name for variable in variables]
+        if ... in variables:
+            variables = Utils.parse_lazy_notation(self.variables, subset=variables)
+
+        variables_names = [variable.name for variable in variables]
         series = self.series
 
-        return ProbabilityDistribution(series.groupby(level=variables).sum())
+        new_probability = ProbabilityDistribution(series.groupby(level=variables_names).sum())
+        new_probability.series.rename('P({})'.format(RandomVariables(tuple(variables))), inplace=True)
+
+        return new_probability
 
     def marginalize_out(self, *variables):
         """
@@ -104,17 +134,9 @@ class ProbabilityDistribution(object):
 
         return P(X) + P(Y) - P(X, Y)
 
-    def __eq__(self, other):
-        if type(other) != ProbabilityDistribution:
-            return False
-        return np.isclose(self.series, other.series).all()
-
     def normalize(self):
         normalized = self.series / self.series.sum()
         return ProbabilityDistribution.from_joint_distribution(normalized)
-
-    def __repr__(self):
-        return self.series.map(lambda x: Fraction(x).limit_denominator()).__repr__()
 
     def __add__(self, other):
         other = other.series if type(other) == ProbabilityDistribution else other
@@ -123,22 +145,6 @@ class ProbabilityDistribution(object):
     def __sub__(self, other):
         # ProbabilityDistribution(self.data - other.data)
         return self.series - other.series
-
-    def __truediv__(self, other):
-        """
-        Based in: https://github.com/pandas-dev/pandas/issues/9368
-        """
-        X = self.series
-        Y = other.series
-
-        on = list(set(X.index.names) & set(Y.index.names))
-        result = pd.merge(X.reset_index(), Y.reset_index(), on=on)
-
-        probability_x, probability_y = result.columns[-2], result.columns[-1]
-        result = result[probability_x] / result[probability_y]
-        result.index = X.index
-
-        return ProbabilityDistribution.from_joint_distribution(result)
 
     @property
     def plot(self):
@@ -154,9 +160,6 @@ class ProbabilityDistribution(object):
     @property
     def E(self):
         return Expectation(self)
-
-    def sum(self):
-        return self.series.sum()
 
     def Val(self, random_variable):
         """

@@ -24,6 +24,9 @@ class Assignment(ContainerVariable):
     def name(self):
         return self.random_variable.name
 
+    def __hash__(self):
+        return self.name.__hash__()
+
     @property
     def random_variable(self):
         return self._random_variable
@@ -31,3 +34,14 @@ class Assignment(ContainerVariable):
     @property
     def as_set(self):
         return {self.random_variable}
+
+    @property
+    def assigned(self):
+        return True
+
+    def __eq__(self, other):
+        if not isinstance(other, Assignment):
+            return super.__eq__(self, other)
+
+        return self.random_variable == other.random_variable \
+           and self.event == other.event
