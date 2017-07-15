@@ -3,7 +3,7 @@ from probability.other.container_variable import ContainerVariable
 
 class Assignment(ContainerVariable):
     """
-    Assign a
+    Denotes an assignment of values to a random variable
     """
 
     def __init__(self, random_variable, event_assigned):

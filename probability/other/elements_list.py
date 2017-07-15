@@ -1,5 +1,5 @@
 from probability.concept.assignment import Assignment
-from probability.concept.conditional import ConditionalRandomVariable
+from probability.concept.random_variable_new import Conditional as ConditionalRandomVariable
 from probability.concept.random_variable import RandomVariable, RandomVariables
 
 from probability.other.utils import Utils

@@ -1,9 +1,11 @@
+'''
 import unittest
 import pandas as pd
 from collections import Counter
 
 from probability.probability_distribution import ProbabilityDistribution
 from probability.experiment import Experiment, Occurrence
+
 
 
 class ExperimentTestCase(unittest.TestCase):
@@ -74,3 +76,4 @@ class ExperimentTestCase(unittest.TestCase):
                 .append(Occurrence('head', 2).to_series('Coin'))
                 .append(Occurrence('tail', 2).to_series('Coin'))
         )
+'''

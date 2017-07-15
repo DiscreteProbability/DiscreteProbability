@@ -1,8 +1,9 @@
+'''
 import pandas as pd
 import unittest
 
 from probability.probability_distribution import ProbabilityDistribution
-from probability.random_variable import RandomVariable
+from probability.concept.random_variable import RandomVariable
 from probability.experiment import Experiment, Occurrence
 
 
@@ -120,3 +121,4 @@ class ProbabilityDistributionTestCase(unittest.TestCase):
         Intelligence, Grade = P.variables
 
         P(Intelligence | (Grade == 'A'))
+'''

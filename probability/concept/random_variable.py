@@ -1,65 +1,40 @@
-from abc import ABCMeta, abstractmethod
 from functools import reduce
 
-from probability.concept.assignment import Assignment
-from probability.concept.conditional import ConditionalRandomVariable
+from typing import Tuple, Union
+from probability.other.utils import Utils
 from probability.concept.event import Event
 
-from probability.other.container_variable import ContainerVariable
+
+class AssignmentError(Exception):
+    pass
 
 
-class AbstractRandomVariable(metaclass=ABCMeta):
-
-    def given(self, *evidences):
-        query = RandomVariables((self, ))
-        return ConditionalRandomVariable(query, RandomVariables(evidences))
-
-    @property
-    @abstractmethod
-    def as_set(self):
-        """
-        :return set:
-        """
-        return None
-
-
-class RandomVariable(AbstractRandomVariable, ContainerVariable):
+class RandomVariable(object):
     """
     **Random variable**, **Random vector** or **Factor**
     """
 
-    def __init__(self, name):
+    def __init__(self, name: str):
         self._name = name
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._name
 
     @property
-    def random_variable(self):
-        return self
-
-    @property
-    def assigned(self):
+    def assigned(self) -> bool:
         return False
 
-    def __eq__(self, other):
-        if type(other) == RandomVariable:
+    def assign(self, event: Event) -> 'Assignment':
+        return Assignment(self.name, event)
+
+    def __eq__(self, other) -> Union['Assignment', bool]:
+        if isinstance(other, RandomVariable):
             return self.name == other.name
-        if other == Ellipsis:
+        if isinstance(other, type(Ellipsis)):
             return False
 
-        return Assignment(self, self._generate_event(other))
-
-    def _generate_event(self, other):
-        if type(other) == Event:
-            event = other
-        elif type(other) == set:
-            event = Event(other)
-        else:
-            event = Event({other})
-
-        return event
+        return self.assign(Utils.build_event(other))
 
     def __hash__(self):
         return self.name.__hash__()
@@ -67,65 +42,75 @@ class RandomVariable(AbstractRandomVariable, ContainerVariable):
     def __repr__(self):
         return self.name
 
-    @property
-    def as_set(self):
-        return {self}
+    def __or__(self, other: 'RandomVariable') -> 'Conditional':
+        return self.given(other)
 
-    def union(self, other):
-        return UnionRandomVariable(self, other)
-
-    def __or__(self, other):
-        other = RandomVariables((other, ))
-        this = RandomVariables((self, ))
-
-        return ConditionalRandomVariable(this, other)
+    def given(self, *evidences: 'RandomVariable') -> 'Conditional':
+        query = SetOfRandomVariable((self, ))
+        return Conditional(query, SetOfRandomVariable(evidences))
 
 
-class RandomVariables(AbstractRandomVariable):
+class Assignment(RandomVariable):
     """
-    `SetOfRandomVariables`
-
-    Data structures that contain ContainerVariable (RandomVariable and Assignments).
+    Denotes an assignment of values to a random variable
     """
 
-    def __init__(self, subset):
-        """
-        :param tuple[ContainerVariable] subset:
-        """
-        self._subset = subset
-        self._dict = dict(map(lambda variable: (variable.name, variable), subset))
+    def __init__(self, name: str, event: Event):
+        super().__init__(name)
+        self._event = event
 
     @property
-    def subset(self):
-        return self._subset
+    def assignment(self) -> Event:
+        return self._event
 
     @property
-    def as_set(self):
-        return set(self.subset)
+    def assigned(self) -> bool:
+        return True
+
+    def __eq__(self, other: 'Assignment') -> bool:
+        if isinstance(other, RandomVariable):
+            return self.name == other.name \
+               and self.assignment == other.assignment
+
+        return False
+
+
+class SetOfRandomVariable(object):
+    """
+    :class:`SetOfRandomVariables` is a Set of random variables (assigned or not)
+    """
+
+    def __init__(self, random_variables: Tuple[RandomVariable]):
+        self._set = random_variables
+        self._dict = dict(map(lambda variable: (variable.name, variable), self._set))
 
     def __repr__(self):
-        return reduce(lambda X, Y: '{}, {}'.format(Y, X), reversed(self.subset[:-1]), '') + self.subset[-1].__repr__()
-
-    def __iter__(self):
-        return self.subset.__iter__()
+        variables = tuple(reversed(self._set))
+        return reduce(lambda X, Y: '{}, {}'.format(Y, X), variables[1:], '') + variables[0].__repr__()
 
     @property
-    def names(self):
-        return list(element.name for element in self.subset)
+    def set(self):
+        return self._set
 
-    def get(self, variable_name):
-        return self._dict[variable_name]
-
-    def __getitem__(self, *args):
-        return self.subset.__getitem__(*args)
-
-    def __getattr__(self, item):
-        return self._dict[item]
+    def __eq__(self, other: 'SetOfRandomVariable'):
+        return self.set == other.set
 
 
-class UnionRandomVariable(object):
+class Conditional(object):
 
-    def __init__(self, X, Y):
-        self.X = X
-        self.Y = Y
+    def __init__(self, query_variables: SetOfRandomVariable, evidences: SetOfRandomVariable):
+        """
+        query_variables given evidences
+        """
+        self.query_variables = query_variables
+        self.evidences = evidences
 
+    def __eq__(self, other):
+        return self.evidences == other.evidences \
+           and self.query_variables == other.query_variables
+
+    def __repr__(self):
+        query = self.query_variables
+        evidences = self.evidences
+
+        return '{} | {}'.format(query, evidences)

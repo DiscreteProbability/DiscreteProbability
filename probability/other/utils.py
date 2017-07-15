@@ -1,4 +1,17 @@
+from probability.concept.event import Event
+from typing import Union, Any
+
+
 class Utils:
+
+    @staticmethod
+    def build_event(other: Union[Event, set, Any]) -> Event:
+        if type(other) == Event:
+            return other
+        elif type(other) == set:
+            return Event(other)
+        else:
+            return Event({other})
 
     @staticmethod
     def parse_lazy_notation(variables, subset, ignore=None):

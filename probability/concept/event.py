@@ -1,7 +1,7 @@
 
 class Event(object):
 
-    def __init__(self, elements):
+    def __init__(self, elements: set):
         """
         :param set elements:
         """
@@ -18,9 +18,10 @@ class Event(object):
         return self.elements == other.elements
 
     @property
-    def is_singleton(self):
+    def is_singleton(self) -> bool:
         """
-        This set is a singleton (unit set)?
-        :return:
+        This set is a singleton?
+
+        Singleton also called "Unit set"
         """
         return len(self.elements) == 1
