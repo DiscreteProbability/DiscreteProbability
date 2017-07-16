@@ -1,16 +1,12 @@
 import pandas as pd
 
-from probability.concept.assignment import Assignment
-from probability.concept.random_variable import RandomVariable, RandomVariables
+from probability.concept.random_variable import RandomVariable, SetOfRandomVariable
 from probability.conditional_distribution import ConditionalDistribution
 from probability.distribution.probability_distribution import AbstractProbabilityDistribution
 from probability.expectation import Expectation
 from probability.other.elements_list import ElementsList
-from probability.other.utils import Utils
+from probability.other.utils import Parser
 from probability.plot.probability_distribution_plotter import ProbabilityDistributionPlotter
-from probability.experiment import Experiment
-
-
 
 
 class ProbabilityDistribution(AbstractProbabilityDistribution):
@@ -106,15 +102,14 @@ class ProbabilityDistribution(AbstractProbabilityDistribution):
 
         return series
 
-    def joint_distribution(self, *variables):
-        if ... in variables:
-            variables = Utils.parse_lazy_notation(self.variables, subset=variables)
+    def joint_distribution(self, *variables: 'RandomVariable'):
+        variables = Parser.lazy_notation(self.variables, subset=variables)
 
         variables_names = [variable.name for variable in variables]
         series = self.series
 
         new_probability = ProbabilityDistribution(series.groupby(level=variables_names).sum())
-        new_probability.series.rename('P({})'.format(RandomVariables(tuple(variables))), inplace=True)
+        new_probability.series.rename('P({})'.format(SetOfRandomVariable(tuple(variables))), inplace=True)
 
         return new_probability
 

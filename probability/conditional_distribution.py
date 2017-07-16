@@ -2,28 +2,25 @@ import seaborn as sns
 
 from probability.distribution.probability_distribution import AbstractProbabilityDistribution
 from probability.concept.assignment import Assignment
+from probability.concept.random_variable import Conditional
 
 
 class ConditionalDistribution(AbstractProbabilityDistribution):
 
-    def __init__(self, probability_distribution, conditional_random_variable):
-        """
-        :param probability_distribution:
-        """
+    def __init__(self, probability_distribution, conditional: Conditional):
         self.P = probability_distribution
-        self.conditional_random_variable = conditional_random_variable
+        self.conditional = conditional
 
     @property
     def distribution(self):
-        query = self.conditional_random_variable.query_variables
-        evidences = self.conditional_random_variable.evidences
+        query = self.conditional.query_variables
+        evidences = self.conditional.evidences
 
-        intersection = query.as_set | evidences.as_set
+        intersection = set(query) | set(evidences)
         P = self.P
 
-        #print(P(*intersection))
-        distribution = P(*intersection) / P(*evidences.subset)
-        distribution.series.rename('P({})'.format(self.conditional_random_variable), inplace=True)
+        distribution = P(*intersection) / P(*evidences.to_tuple())
+        distribution.series.rename('P({})'.format(self.conditional), inplace=True)
 
         return distribution
 
@@ -32,7 +29,7 @@ class ConditionalDistribution(AbstractProbabilityDistribution):
         return self.distribution.series
 
     def to_dataframe(self):
-        query_variables = self.conditional_random_variable.query_variables
+        query_variables = self.conditional.query_variables
         return self.series.unstack(query_variables.names).fillna(0)
 
     def plot(self):
@@ -57,7 +54,6 @@ class ConditionalDistribution(AbstractProbabilityDistribution):
 
         events = tuple(events)
         reduction = self.series.loc[events]
-        print(reduction)
         return reduction
 
         #return P.from_joint_distribution(reduction)

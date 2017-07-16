@@ -1,6 +1,6 @@
 import unittest
 
-from probability.concept.random_variable_new import RandomVariable, SetOfRandomVariable, Assignment, Conditional
+from probability.concept.random_variable import RandomVariable, SetOfRandomVariable, Assignment, Conditional
 from probability.concept.event import Event
 
 

@@ -1,7 +1,6 @@
 from functools import reduce
 
 from typing import Tuple, Union
-from probability.other.utils import Utils
 from probability.concept.event import Event
 
 
@@ -34,7 +33,7 @@ class RandomVariable(object):
         if isinstance(other, type(Ellipsis)):
             return False
 
-        return self.assign(Utils.build_event(other))
+        return self.assign(Event.by(other))
 
     def __hash__(self):
         return self.name.__hash__()
@@ -80,20 +79,38 @@ class SetOfRandomVariable(object):
     :class:`SetOfRandomVariables` is a Set of random variables (assigned or not)
     """
 
-    def __init__(self, random_variables: Tuple[RandomVariable]):
-        self._set = random_variables
-        self._dict = dict(map(lambda variable: (variable.name, variable), self._set))
-
-    def __repr__(self):
-        variables = tuple(reversed(self._set))
-        return reduce(lambda X, Y: '{}, {}'.format(Y, X), variables[1:], '') + variables[0].__repr__()
+    def __init__(self, random_variables: Tuple[RandomVariable, ...]):
+        self._random_variables = random_variables
+        self._dict = dict(map(lambda variable: (variable.name, variable), self._random_variables))
 
     @property
-    def set(self):
-        return self._set
+    def names(self):
+        return list(variable.name for variable in self._random_variables)
+
+    def to_tuple(self):
+        return tuple(self._random_variables)
+
+    def to_set(self) -> set:
+        return set(self._random_variables)
+
+    def __repr__(self):
+        variables = tuple(reversed(self.to_tuple()))
+        return reduce(lambda X, Y: '{}, {}'.format(Y, X), variables[1:], '') + variables[0].__repr__()
+
+    def __iter__(self):
+        return self.to_tuple().__iter__()
+
+    def __getitem__(self, *args):
+        return self.to_tuple().__getitem__(*args)
+
+    def __getattr__(self, item):
+        try:
+            return self._dict[item]
+        except:
+            raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, item))
 
     def __eq__(self, other: 'SetOfRandomVariable'):
-        return self.set == other.set
+        return self.to_set() == other.to_set()
 
 
 class Conditional(object):
@@ -106,6 +123,9 @@ class Conditional(object):
         self.evidences = evidences
 
     def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return False
+
         return self.evidences == other.evidences \
            and self.query_variables == other.query_variables
 

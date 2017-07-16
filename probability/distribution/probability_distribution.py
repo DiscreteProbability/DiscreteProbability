@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 from abc import ABCMeta, abstractmethod
-from probability.concept.random_variable import RandomVariable, RandomVariables
+from probability.concept.random_variable import RandomVariable, SetOfRandomVariable
 
 
 def joint_distribution(series_or_dataframe):
@@ -17,11 +17,11 @@ def joint_distribution(series_or_dataframe):
 class AbstractProbabilityDistribution(metaclass=ABCMeta):
 
     @property
-    def variables(self):
+    def variables(self) -> SetOfRandomVariable:
         index = self.series.index
         names = [index.name] if type(index) == pd.Index else index.names
 
-        return RandomVariables(tuple(RandomVariable(column) for column in names))
+        return SetOfRandomVariable(tuple(RandomVariable(column) for column in names))
 
     @property
     @abstractmethod

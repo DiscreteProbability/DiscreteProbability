@@ -1,13 +1,14 @@
 import unittest
 
-from probability.concept.random_variable_new import RandomVariable, SetOfRandomVariable, Assignment, Conditional
+from probability.concept.random_variable import RandomVariable, Assignment
 from probability.concept.event import Event
 
 
 class AssignmentTestCase(unittest.TestCase):
 
     def test_assigned(self):
-        assignment = RandomVariable('A') == {1, 2, 3}
+        assignment = Assignment('A', Event({1, 2, 3}))
+
         self.assertTrue(assignment.assigned)
 
     def test___eq__(self):

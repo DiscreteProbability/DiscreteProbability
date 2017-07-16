@@ -1,35 +1,26 @@
-from probability.concept.event import Event
-from typing import Union, Any
+from typing import Union, Tuple
+from probability.concept.random_variable import RandomVariable, SetOfRandomVariable
 
 
-class Utils:
-
-    @staticmethod
-    def build_event(other: Union[Event, set, Any]) -> Event:
-        if type(other) == Event:
-            return other
-        elif type(other) == set:
-            return Event(other)
-        else:
-            return Event({other})
+class Parser:
 
     @staticmethod
-    def parse_lazy_notation(variables, subset, ignore=None):
+    def lazy_notation(
+            variables: SetOfRandomVariable,
+            subset: Tuple[Union[RandomVariable, type(...)], ...],
+            ignore: Union[SetOfRandomVariable, None] = None) -> SetOfRandomVariable:
         """
         Replace ellipsis (...) in subset for variables - subset - ignore
-
-        :param variables:
-        :param subset:
-        :param ignore:
-
-        :return:
         """
-        ignore = [] if ignore is None else ignore
+        ignore = SetOfRandomVariable(tuple()) if ignore is None else ignore
+        middle = tuple(set(variables) - set(subset) - set(ignore))
+
+        if Ellipsis not in subset:
+            return SetOfRandomVariable(middle)
 
         index = subset.index(...)
 
         head = subset[:index]
-        middle = tuple(set(variables) - set(subset) - set(ignore))
         tail = subset[index + 1:]
 
-        return head + middle + tail
+        return SetOfRandomVariable(head + middle + tail)

@@ -1,5 +1,16 @@
+from typing import Union, Any
+
 
 class Event(object):
+
+    @staticmethod
+    def by(data: Union['Event', set, Any]) -> 'Event':
+        if type(data) == Event:
+            return data
+        elif type(data) == set:
+            return Event(data)
+        else:
+            return Event({data})
 
     def __init__(self, elements: set):
         """
