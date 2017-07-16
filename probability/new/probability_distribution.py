@@ -6,6 +6,7 @@ import numpy as np
 
 from abc import ABCMeta, abstractmethod
 from probability.concept.random_variable import RandomVariable, SetOfRandomVariable
+from typing import Callable
 
 
 def joint_distribution(series_or_dataframe):
@@ -14,7 +15,7 @@ def joint_distribution(series_or_dataframe):
     return ProbabilityDistribution.from_joint_distribution(series_or_dataframe)
 
 
-class AbstractProbabilityDistribution(metaclass=ABCMeta):
+class ProbabilityDistribution(metaclass=ABCMeta):
 
     @property
     def variables(self) -> SetOfRandomVariable:
@@ -47,36 +48,39 @@ class AbstractProbabilityDistribution(metaclass=ABCMeta):
     def sum(self):
         return self.series.sum()
 
-    def __eq__(self, other):
-        #common_variables = set(self.variables) & set(other.variables)
-        #common_variables = tuple(common_variables)
+    def __eq__(self, other) -> bool:
+        if self.variables != other.variables:
+            return False
+            #common_variables = set(self.variables) & set(other.variables)
+            #common_variables = tuple(common_variables)
 
-        #this = self(*common_variables)
-        #other = other(*common_variables)
+            #this = self(*common_variables)
+            #other = other(*common_variables)
 
-        #this
-        #other
         # Sort columns
-        series = other.series.reorder_levels(self.variables.names)
-        series.sort_index(inplace=True)
+        variables = self.variables
 
-        other = joint_distribution(series)
+        if len(variables.to_tuple()) > 1:
+            series = other.series.reorder_levels(self.variables.names)
+            series.sort_index(inplace=True)
+
+            other = joint_distribution(series)
 
         return np.isclose(self.series, other.series).all()
 
-    def __mul__(self, other):
+    def __mul__(self, other: 'ProbabilityDistribution') -> 'ProbabilityDistribution':
         name = self.series.name + ' ' + other.series.name
         operation = operator.mul
 
         return self._calcule(other, operation, name)
 
-    def __truediv__(self, other):
+    def __truediv__(self, other: 'ProbabilityDistribution') -> 'ProbabilityDistribution':
         name = self.series.name + ' / ' + other.series.name
         operation = operator.truediv
 
         return self._calcule(other, operation, name)
 
-    def _calcule(self, other, operation, new_name):
+    def _calcule(self, other: 'ProbabilityDistribution', operation: Callable, new_name: str) -> 'ProbabilityDistribution':
         """
         Based in: https://github.com/pandas-dev/pandas/issues/9368
         """

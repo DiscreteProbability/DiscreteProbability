@@ -21,7 +21,7 @@ class ElementsList(object):
         return any(isinstance(element, Conditional) for element in self.elements)
 
     def contains_assignment(self):
-        return any(type(element) == Assignment for element in self.elements)
+        return any(element.assigned for element in self.elements)
 
     def is_only_values(self):
         return all(self._element_is_value(element) for element in self.elements)

@@ -1,21 +1,24 @@
 import pandas as pd
 from functools import reduce
+from typing import Union, Iterable
+
+Number = Union[int, float]
 
 
 class Occurrence(object):
-    def __init__(self, keys, total=1):
+    def __init__(self, keys: Iterable, total: Number=1):
         self.keys = keys
         self.total = total
 
-    def to_series(self, *columns):
+    def to_series(self, *columns) -> pd.Series:
         if len(columns) == 1:
-            index = pd.Index([self.keys], name=columns[0])
+            index = pd.Index(self.keys, name=columns[0])
         else:
             index = pd.MultiIndex.from_arrays(self.keys, names=columns)
 
         return pd.Series(self.total, index=index, name=columns)
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'Occurrence'):
         return self.keys == other.keys \
            and self.total == other.total
 

@@ -16,7 +16,11 @@ class Event(object):
         """
         :param set elements:
         """
-        self.elements = elements
+        self._elements = elements
+
+    @property
+    def elements(self):
+        return self._elements
 
     def __repr__(self):
         element = self.elements if not self.is_singleton else next(self.elements.__iter__())

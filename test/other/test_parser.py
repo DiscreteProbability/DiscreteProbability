@@ -32,10 +32,12 @@ class ParserTestCase(unittest.TestCase):
         self.assertEqual(result[-1], X)
 
     def test_lazy_notation_not_ellipsis(self):
-        variables = SetOfRandomVariable((RandomVariable('X'), RandomVariable('Y'), RandomVariable('Z'), RandomVariable('W')))
-        subset = (RandomVariable('X'), )
+        X, Y, Z, W = RandomVariable('X'), RandomVariable('Y'), RandomVariable('Z'), RandomVariable('W')
 
-        expected = SetOfRandomVariable((RandomVariable('Y'), RandomVariable('Z'), RandomVariable('W')))
+        variables = SetOfRandomVariable((X, Y, Z, W))
+        subset = (RandomVariable(X),)
+
+        expected = SetOfRandomVariable((X, ))
 
         result = Parser.lazy_notation(variables, subset=subset)
         self.assertEqual(expected, result)

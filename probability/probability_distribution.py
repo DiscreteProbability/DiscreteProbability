@@ -52,6 +52,7 @@ class ProbabilityDistribution(AbstractProbabilityDistribution):
             return ConditionalDistribution(self, elements_list.to_conditional_random_variable())
 
         if elements_list.is_only_values():
+
             return self.reduction(*[X == x for X, x in zip(self.variables, elements_list.elements)])
 
         if elements_list.contains_assignment():

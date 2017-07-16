@@ -12,15 +12,14 @@ class Parser:
         """
         Replace ellipsis (...) in subset for variables - subset - ignore
         """
-        ignore = SetOfRandomVariable(tuple()) if ignore is None else ignore
-        middle = tuple(set(variables) - set(subset) - set(ignore))
-
         if Ellipsis not in subset:
-            return SetOfRandomVariable(middle)
+            return SetOfRandomVariable(subset)
 
+        ignore = SetOfRandomVariable(tuple()) if ignore is None else ignore
         index = subset.index(...)
 
         head = subset[:index]
+        middle = tuple(set(variables) - set(subset) - set(ignore))
         tail = subset[index + 1:]
 
         return SetOfRandomVariable(head + middle + tail)

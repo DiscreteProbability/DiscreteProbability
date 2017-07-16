@@ -1,6 +1,6 @@
 from functools import reduce
 
-from typing import Tuple, Union
+from typing import Tuple, Union, Iterable
 from probability.concept.event import Event
 
 
@@ -66,6 +66,9 @@ class Assignment(RandomVariable):
     def assigned(self) -> bool:
         return True
 
+    def random_variable(self) -> 'RandomVariable':
+        return RandomVariable(self.name)
+
     def __eq__(self, other: 'Assignment') -> bool:
         if isinstance(other, RandomVariable):
             return self.name == other.name \
@@ -73,11 +76,18 @@ class Assignment(RandomVariable):
 
         return False
 
+    def __repr__(self):
+        representation = '{} = {}' if self.assignment.is_singleton else '{} ∈ {}'
+        return representation.format(self.name, self.assignment)
+
 
 class SetOfRandomVariable(object):
     """
     :class:`SetOfRandomVariables` is a Set of random variables (assigned or not)
     """
+
+    def from_iterable(self, names: Iterable) -> 'SetOfRandomVariable':
+        return SetOfRandomVariable(tuple(RandomVariable(name) for name in names))
 
     def __init__(self, random_variables: Tuple[RandomVariable, ...]):
         self._random_variables = random_variables
@@ -92,6 +102,13 @@ class SetOfRandomVariable(object):
 
     def to_set(self) -> set:
         return set(self._random_variables)
+
+    def only_random_variables(self) -> Tuple[RandomVariable, ...]:
+        """
+        Returns only the random variable. If contains a assignment,
+        is returned your random variable.
+        """
+        return tuple(RandomVariable(variable.name) for variable in self._random_variables)
 
     def __repr__(self):
         variables = tuple(reversed(self.to_tuple()))

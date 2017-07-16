@@ -21,6 +21,7 @@ class ExperimentTestCase(unittest.TestCase):
 
         self.assertEqual(expected, experiment)
 
+    '''
     def test_to_series(self):
         column = 'Coin'
         expected = Occurrence('head', 3).to_series(column)
@@ -66,4 +67,5 @@ class ExperimentTestCase(unittest.TestCase):
         experiment.register(Occurrence(['a1', 'b1', 'c2'], 3))
         experiment.register(Occurrence(['a1', 'b2', 'c1']))
 
-        self.assertEqual(ProbabilityDistribution.from_joint_distribution(expected), experiment.calcule())
+        self.assertEqual(ProbabilityDistribution.from_joint_distribution(expected), ProbabilityDistribution.from_joint_distribution(experiment.count()))
+'''
