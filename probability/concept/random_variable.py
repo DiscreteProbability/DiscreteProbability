@@ -66,13 +66,12 @@ class Assignment(RandomVariable):
     def assigned(self) -> bool:
         return True
 
-    def random_variable(self) -> 'RandomVariable':
-        return RandomVariable(self.name)
-
     def __eq__(self, other: 'Assignment') -> bool:
-        if isinstance(other, RandomVariable):
+        if isinstance(other, Assignment):
             return self.name == other.name \
                and self.assignment == other.assignment
+        if isinstance(other, RandomVariable):
+            return self.name == other.name
 
         return False
 

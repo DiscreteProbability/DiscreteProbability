@@ -1,10 +1,10 @@
-import pandas as pd
 import unittest
 
-from probability.probability_distribution import ProbabilityDistribution
+import pandas as pd
+
 from probability.concept.random_variable import RandomVariable, SetOfRandomVariable
-from probability.experiment import Experiment, Occurrence
 from probability.new.joint_distribution import JointDistribution
+
 
 class JointDistributionTestCase(unittest.TestCase):
 

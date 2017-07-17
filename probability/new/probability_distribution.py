@@ -9,10 +9,13 @@ from probability.concept.random_variable import RandomVariable, SetOfRandomVaria
 from typing import Callable
 
 
-def joint_distribution(series_or_dataframe):
-    from probability.probability_distribution import ProbabilityDistribution
+def joint_distribution(data):
+    from probability.new.joint_distribution import JointDistribution
 
-    return ProbabilityDistribution.from_joint_distribution(series_or_dataframe)
+    if isinstance(data, pd.DataFrame):
+        return JointDistribution.from_dataframe(data)
+    else:
+        return JointDistribution.from_series(data)
 
 
 class ProbabilityDistribution(metaclass=ABCMeta):
@@ -29,7 +32,7 @@ class ProbabilityDistribution(metaclass=ABCMeta):
     def series(self) -> pd.Series:
         return None
 
-    def argmax(self, *variables):
+    def argmax(self, *variables: RandomVariable):
         """
         Arguments of the maxima (or argmax) returns the assignments that causes the maximum
         value in probability distribution.
@@ -38,10 +41,10 @@ class ProbabilityDistribution(metaclass=ABCMeta):
         if not variables:
             variables = self.variables
 
-        method = lambda assignment: assignment.random_variable in variables
+        method = lambda assignment: assignment in variables
 
         maximum = self.series.argmax()
-        argmax = (variable == value for variable, value in zip(self.variables, maximum))
+        argmax = tuple(variable == value for variable, value in zip(self.variables, maximum))
 
         return tuple(filter(method, argmax))
 

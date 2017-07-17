@@ -24,6 +24,10 @@ class JointDistribution(ProbabilityDistribution):
         return Builder.from_experiment(experiment)
 
     @staticmethod
+    def from_dataframe(distribution: pd.DataFrame) -> 'JointDistribution':
+        return Builder.from_dataframe(distribution)
+
+    @staticmethod
     def from_series(distribution: Series) -> 'JointDistribution':
         return Builder.from_series(distribution)
 
@@ -152,6 +156,15 @@ class Builder(object):
     @staticmethod
     def from_experiment(experiment: Experiment) -> 'JointDistribution':
         series = experiment.count()
+        return Builder.from_series(series)
+
+    @staticmethod
+    def from_dataframe(dataframe: pd.DataFrame):
+        columns = list(dataframe.columns)
+        series_columns = columns[:-1]
+        series_value = columns[-1]
+
+        series = dataframe.groupby(series_columns).sum()[series_value]
         return Builder.from_series(series)
 
     @staticmethod

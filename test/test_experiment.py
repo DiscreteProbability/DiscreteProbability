@@ -1,8 +1,6 @@
 import unittest
-import pandas as pd
 from collections import Counter
 
-from probability.probability_distribution import ProbabilityDistribution
 from probability.experiment import Experiment, Occurrence
 
 

@@ -19,3 +19,4 @@ class AssignmentTestCase(unittest.TestCase):
         self.assertEqual(assignment, assignment)
         self.assertNotEqual(assignment, assignment2)
         self.assertNotEqual(assignment, assignment3)
+
