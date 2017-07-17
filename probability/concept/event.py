@@ -22,6 +22,15 @@ class Event(object):
     def elements(self):
         return self._elements
 
+    @property
+    def is_singleton(self) -> bool:
+        """
+        This set is a singleton?
+
+        Singleton also called "Unit set"
+        """
+        return len(self.elements) == 1
+
     def __repr__(self):
         element = self.elements if not self.is_singleton else next(self.elements.__iter__())
         return element.__repr__()
@@ -32,11 +41,5 @@ class Event(object):
     def __eq__(self, other):
         return self.elements == other.elements
 
-    @property
-    def is_singleton(self) -> bool:
-        """
-        This set is a singleton?
-
-        Singleton also called "Unit set"
-        """
-        return len(self.elements) == 1
+    def __hash__(self):
+        return str(self.elements).__hash__()

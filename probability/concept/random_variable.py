@@ -80,6 +80,9 @@ class Assignment(RandomVariable):
         representation = '{} = {}' if self.assignment.is_singleton else '{} ∈ {}'
         return representation.format(self.name, self.assignment)
 
+    def __hash__(self):
+        return hash(self.name.__hash__() + self.assignment.__hash__())
+
 
 class SetOfRandomVariable(object):
     """

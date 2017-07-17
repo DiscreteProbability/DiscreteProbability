@@ -23,7 +23,11 @@ class JointDistributionTestCase(unittest.TestCase):
         return JointDistribution.from_list(distribution, variables)
 
     def to_series(self, index, names, values, name=None):
-        index = pd.MultiIndex.from_tuples(index, names=names)
+        if len(names) > 1:
+            index = pd.MultiIndex.from_tuples(index, names=names)
+        else:
+            index = pd.Index(index, names=names)
+
         return pd.Series(values, index=index, name=name)
 
     def test_empty(self):
@@ -48,7 +52,7 @@ class JointDistributionTestCase(unittest.TestCase):
         result = JointDistribution.from_list(distribution, ('Intelligence',))
         self.assertEqual(result, P.marginalize_out(Grade))
 
-    def test_reduction(self):
+    def test_reduction_multiindex(self):
         table = (
             ('low', 'A'),
             ('low', 'B'),
@@ -58,29 +62,66 @@ class JointDistributionTestCase(unittest.TestCase):
         variables = ('Intelligence', 'Grade')
         series = self.to_series(table, variables, values, name="P((Intelligence, Grade))")
 
-
         P = self.P
         Intelligence, Grade = P.variables
 
-        print(series)
-        print(P(Intelligence=='low', Grade).series)
         self.assertTrue(series.equals(P(Intelligence=='low', Grade).series))
+
+    def test_reduction_index(self):
+        table = (
+            ('low'),
+        )
+        values = (0.7)
+        variables = ('Intelligence',)
+        series = self.to_series(table, variables, values, name="P((Intelligence))")
+
+        P = self.P
+        Intelligence = P.variables.Intelligence
+
+        self.assertTrue(series.equals(P(Intelligence == 'low').series))
 
     def test_conditional(self):
         table = (
+            ('high', 'A'),
+            ('high', 'B'),
+            ('high', 'C'),
             ('low', 'A'),
             ('low', 'B'),
             ('low', 'C'),
         )
-        values = (0.07, 0.28, 0.35)
+        values = (0.6, 0.3, 0.1, 0.1, 0.4, 0.5)
         variables = ('Intelligence', 'Grade')
-        series = self.to_series(table, variables, values)
+        series = self.to_series(table, variables, values, name='P(Grade | Intelligence)')
 
         P = self.P
         Intelligence, Grade = P.variables
 
-        self.assertTrue(series.equals(P(Intelligence | Grade)))
-        self.assertTrue(series.equals(P(Intelligence.given(Grade))))
+        self.assertTrue(series.equals(P(Grade | Intelligence).series))
+        self.assertEqual(P(Grade.given(Intelligence).series), P(Grade | Intelligence))
+
+    def test_conditional_assigned(self):
+        P = self.P
+        Intelligence, Grade = P.variables
+
+        conditional = P((Grade == 'B') | Intelligence)
+        print(conditional.series)
+
+        conditional = P(Grade | (Intelligence == 'high'))
+        print(conditional.series)
+
+        conditional = P((Grade == 'B') | (Intelligence == 'high'))
+        print(conditional.series)
+
+        assert False
+
+    def test_conditional_assigned_none(self):
+        P = self.P
+        Intelligence, Grade = P.variables
+
+        case = (Grade == 'X').given(Intelligence=='AAAAAA')
+        probability = P(case)
+        probability.series
+        self.assertEqual(0, probability)
 
     '''
     def test_P_at_X_equals(self):

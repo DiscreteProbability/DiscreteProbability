@@ -5,8 +5,8 @@ from pandas import Series
 
 from probability.concept.random_variable import RandomVariable, SetOfRandomVariable, Conditional
 from probability.experiment import Experiment, Occurrence
+from probability.new.conditional_distribution import ConditionalDistribution
 from probability.new.probability_distribution import ProbabilityDistribution
-
 from probability.other.elements_list import ElementsList
 from probability.other.utils import Parser
 
@@ -50,15 +50,23 @@ class JointDistribution(ProbabilityDistribution):
 
         events = Utils.extract_events(self, variables)
         marginalized = P(*variables.only_random_variables())
-        reduction = marginalized.series.loc[events]
+
+        # Fixme - Any event not presents in joint distribution (index)
+        try:
+            reduction = marginalized.series.loc[events]
+        except:
+            reduction = 0
 
         # FIXME Extract
         if not isinstance(reduction, pd.Series):
             names = list(variable.name for variable in variables)
-            index = pd.MultiIndex.from_arrays(events, names=names)
+            if len(names) > 1:
+                index = pd.MultiIndex.from_arrays(events, names=names)
+            else:
+                index = pd.Index(events, name=names[0])
 
             reduction = pd.Series([reduction], index=index)
-            reduction.name = 'names'  # FIXME
+            reduction.name = 'P({})'.format(variables)  # FIXME
 
         # FIXME Returns a ProbabilityDistribution, not a Joint distribuion
         return JointDistribution(reduction)
