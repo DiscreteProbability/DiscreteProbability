@@ -1,11 +1,11 @@
 import seaborn as sns
 
-from probability.new.probability_distribution import ProbabilityDistribution
-from probability.concept.assignment import Assignment
-from probability.concept.random_variable import Conditional
+from discrete_probability.distribution.probability_distribution import AbstractProbabilityDistribution
+from discrete_probability.concept.assignment import Assignment
+from discrete_probability.concept.random_variable import Conditional
 
 
-class ConditionalDistribution(ProbabilityDistribution):
+class ConditionalDistribution(AbstractProbabilityDistribution):
 
     def __init__(self, probability_distribution, conditional: Conditional):
         self.P = probability_distribution

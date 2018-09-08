@@ -1,7 +1,7 @@
 import unittest
 
-from probability.concept.random_variable import RandomVariable, Assignment
-from probability.concept.event import Event
+from discrete_probability.concept.random_variable import RandomVariable, Assignment
+from discrete_probability.concept.event import Event
 
 
 class AssignmentTestCase(unittest.TestCase):

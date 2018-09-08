@@ -23,23 +23,23 @@ def readme():
         return f.read()
 
 setup(
-    name='Probability',
+    name='DiscreteProbability',
     version='0.2.0',
 
-    #description='Pythonic management of LV2 audio plugins with mod-host.',
-    #long_description=readme(),
+    description='A simple library to inspect discrete probabilities in simple datasets',
+    long_description=readme(),
 
-    #url='https://github.com/PedalPi/PluginsManager',
+    url='https://github.com/DiscreteProbability/DiscreteProbability',
 
     author='Paulo Mateus Moura da Silva (SrMouraSilva)',
     author_email='mateus.moura@hotmail.com',
     maintainer='Paulo Mateus Moura da Silva (SrMouraSilva)',
     maintainer_email='mateus.moura@hotmail.com',
 
-    #license="Apache Software License v2",
+    license="Apache Software License v2",
 
     packages=[
-        'probability',
+        'discrete_probability',
     ],
     install_requires=[
         'numpy',
@@ -48,13 +48,16 @@ setup(
         'seaborn'
     ],
 
+    test_suite='test',
+    tests_require=['pytest', 'pytest-cov'],
+
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
-        #'License :: OSI Approved :: Apache Software License',
+        'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6'
     ],
-    #keywords='pedal-pi mod-host lv2 audio plugins-manager',
+    keywords='probability discrete-probability',
 )

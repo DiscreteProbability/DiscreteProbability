@@ -1,12 +1,12 @@
 import pandas as pd
 
-from probability.concept.random_variable import RandomVariable, SetOfRandomVariable
-from probability.conditional_distribution import ConditionalDistribution
-from probability.distribution.probability_distribution import AbstractProbabilityDistribution
-from probability.expectation import Expectation
-from probability.other.elements_list import ElementsList
-from probability.other.utils import Parser
-from probability.plot.probability_distribution_plotter import ProbabilityDistributionPlotter
+from discrete_probability.concept.random_variable import RandomVariable, SetOfRandomVariable
+from discrete_probability.conditional_distribution import ConditionalDistribution
+from discrete_probability.distribution.probability_distribution import AbstractProbabilityDistribution
+from discrete_probability.expectation import Expectation
+from discrete_probability.other.elements_list import ElementsList
+from discrete_probability.other.utils import Parser
+from discrete_probability.plot.probability_distribution_plotter import ProbabilityDistributionPlotter
 
 
 class ProbabilityDistribution(AbstractProbabilityDistribution):

@@ -2,8 +2,8 @@ import unittest
 
 import pandas as pd
 
-from probability.concept.random_variable import RandomVariable, SetOfRandomVariable
-from probability.new.joint_distribution import JointDistribution
+from discrete_probability.concept.random_variable import RandomVariable, SetOfRandomVariable
+from discrete_probability.new.joint_distribution import JointDistribution
 
 
 class JointDistributionTestCase(unittest.TestCase):
@@ -78,6 +78,7 @@ class JointDistributionTestCase(unittest.TestCase):
         P = self.P
         Intelligence = P.variables.Intelligence
 
+        print(P(Intelligence == 'low'))
         self.assertTrue(series.equals(P(Intelligence == 'low').series))
 
     def test_conditional(self):
@@ -114,13 +115,18 @@ class JointDistributionTestCase(unittest.TestCase):
 
         assert False
 
+    def test_assignment_inexistent(self):
+        P = self.P
+        Intelligence, Grade = P.variables
+
+        print(P(Intelligence=={'high', 'low', 'maybe'}, Grade=={'A', 'B', 'C', 'D'}))
+
     def test_conditional_assigned_none(self):
         P = self.P
         Intelligence, Grade = P.variables
 
         case = (Grade == 'X').given(Intelligence=='AAAAAA')
         probability = P(case)
-        probability.series
         self.assertEqual(0, probability)
 
     '''

@@ -2,9 +2,9 @@
 import pandas as pd
 import unittest
 
-from probability.probability_distribution import ProbabilityDistribution
-from probability.concept.random_variable import RandomVariable
-from probability.experiment import Experiment, Occurrence
+from discrete_probability.probability_distribution import ProbabilityDistribution
+from discrete_probability.concept.random_variable import RandomVariable
+from discrete_probability.experiment import Experiment, Occurrence
 
 
 class ProbabilityDistributionTestCase(unittest.TestCase):

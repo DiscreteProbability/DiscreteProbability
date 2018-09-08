@@ -1,7 +1,7 @@
 import unittest
 
-from probability.concept.random_variable import RandomVariable, SetOfRandomVariable
-from probability.other.utils import Parser
+from discrete_probability.concept.random_variable import RandomVariable, SetOfRandomVariable
+from discrete_probability.other.utils import Parser
 
 
 class ParserTestCase(unittest.TestCase):

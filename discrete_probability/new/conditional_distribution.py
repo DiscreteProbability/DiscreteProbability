@@ -1,18 +1,18 @@
 import seaborn as sns
 
-from probability.distribution.probability_distribution import AbstractProbabilityDistribution
+from probability.new.probability_distribution import ProbabilityDistribution
 from probability.concept.assignment import Assignment
 from probability.concept.random_variable import Conditional
 
 
-class ConditionalDistribution(AbstractProbabilityDistribution):
+class ConditionalDistribution(ProbabilityDistribution):
 
     def __init__(self, probability_distribution, conditional: Conditional):
         self.P = probability_distribution
         self.conditional = conditional
+        self._distribution = self._calcule_distribution()
 
-    @property
-    def distribution(self):
+    def _calcule_distribution(self):
         query = self.conditional.query_variables
         evidences = self.conditional.evidences
 
@@ -23,6 +23,10 @@ class ConditionalDistribution(AbstractProbabilityDistribution):
         distribution.series.rename('P({})'.format(self.conditional), inplace=True)
 
         return distribution
+
+    @property
+    def distribution(self):
+        return self._distribution
 
     @property
     def series(self):

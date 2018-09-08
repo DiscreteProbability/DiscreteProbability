@@ -1,6 +1,6 @@
 import unittest
 
-from probability.concept.event import Event
+from discrete_probability.concept.event import Event
 
 
 class EventTestCase(unittest.TestCase):

@@ -9,6 +9,7 @@ from probability.new.conditional_distribution import ConditionalDistribution
 from probability.new.probability_distribution import ProbabilityDistribution
 from probability.other.elements_list import ElementsList
 from probability.other.utils import Parser
+from probability.new.joint_distribution_plotter import JointDistributionPlotter
 
 
 class JointDistribution(ProbabilityDistribution):
@@ -58,6 +59,11 @@ class JointDistribution(ProbabilityDistribution):
         # Fixme - Any event not presents in joint distribution (index)
         try:
             reduction = marginalized.series.loc[events]
+
+            # Fixme - All possibilities
+            #new_index = pd.MultiIndex.from_product(events, names=variables.names)
+            #reduction = reduction.reindex(new_index, fill_value=0, copy=False)
+
         except:
             reduction = 0
 
@@ -112,6 +118,10 @@ class JointDistribution(ProbabilityDistribution):
         :return:
         """
         pass
+
+    @property
+    def plot(self):
+        return JointDistributionPlotter(self)
 
 
 class ElementsListParser(object):

@@ -1,7 +1,7 @@
 import pandas as pd
 import unittest
 
-from probability.experiment import Occurrence
+from discrete_probability.experiment import Occurrence
 
 
 '''

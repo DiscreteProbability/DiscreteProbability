@@ -1,7 +1,7 @@
 import unittest
 from collections import Counter
 
-from probability.experiment import Experiment, Occurrence
+from discrete_probability.experiment import Experiment, Occurrence
 
 
 class ExperimentTestCase(unittest.TestCase):

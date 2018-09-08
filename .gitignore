@@ -94,3 +94,6 @@ ENV/
 
 ## Others
 .idea
+
+venv
+.pytest_cache

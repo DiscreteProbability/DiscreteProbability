@@ -1,9 +1,9 @@
 import pandas as pd
 
 from typing import List, Iterable
-from probability.experiment import Experiment
-from probability.concept.random_variable import RandomVariable, SetOfRandomVariable
-from probability.probability_distribution import ProbabilityDistribution
+from discrete_probability.experiment import Experiment
+from discrete_probability.concept.random_variable import RandomVariable, SetOfRandomVariable
+from discrete_probability.probability_distribution import ProbabilityDistribution
 
 
 class JointDistribution(object):
